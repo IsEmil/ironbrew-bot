@@ -1,128 +1,117 @@
-const wait = require('node:timers/promises').setTimeout;
-const discord = require("discord.js");
-const fetch = require("node-fetch");
-const cp = require("child_process");
-const stream = require("stream");
-const util = require("util");
+require("dotenv").config();
+
+const {
+    REST,
+    Routes,
+    Client,
+    GatewayIntentBits,
+    EmbedBuilder,
+    ActivityType,
+    Partials,
+} = require("discord.js");
 const path = require("path");
-const tmp = require("tmp");
 const fs = require("fs");
 
-const config = require("./config.js");
-const client = new discord.Client({
+const client = new Client({
     intents: [
-        "GUILDS",
-        "GUILD_MESSAGES",
-        "GUILD_MEMBERS",
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMessageTyping,
+    ],
+    partials: [
+        Partials.User,
+        Partials.Channel,
+        Partials.GuildMember,
     ]
 });
-const streamPipeline = util.promisify(stream.pipeline);
 
-// util
-function makeid(length) {
-    var result = '';
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for (var i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+let commandMap = new Map();
+
+/**
+ * @description Loads all available commands
+ */
+function loadCommands() {
+    const commandsPath = path.join(__dirname, 'interactions');
+    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+    for (const file of commandFiles) {
+        try {
+            const filePath = path.join(commandsPath, file);
+            const command = require(filePath);
+            commandMap.set(command.data.name, command);
+            console.log(`Loaded command '${command.data.name}.js'`);
+        } catch (err) {
+            console.log(err);
+        }
     }
-    return result;
 }
 
-function obfuscate(source) {
-    const input = tmp.fileSync();
-    const output = tmp.fileSync();
+/**
+ * @description Loads all slash commands
+ */
+function deployCommands() {
+    const commands = [];
+    const commandsPath = path.join(__dirname, 'interactions');
+    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
-    fs.writeFileSync(input.name, source);
+    for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+        const command = require(filePath);
+        commands.push(command.data.toJSON());
+    }
 
-    cp.spawn("dotnet", [path.join(__dirname, "/ironbrew/IronBrew2 CLI/bin/Debug/netcoreapp3.1/IronBrew2 CLI.dll"), input.name, output.name], {
-        cwd: path.join(__dirname, "/ironbrew/IronBrew2 CLI/bin/Debug/netcoreapp3.1/"),
-        detached: true,
-    }).on("exit", (code) => {
-        if (code !== 0) return reject(new Error("Unknown error"));
+    const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
-        input.removeCallback();
-        output.removeCallback();
-
+    rest.put(Routes.applicationGuildCommands(client.user.id, "827916807574257704"), { body: commands }).then(() => {
+        console.log('Successfully registered application commands.')
+    }).catch((err) => {
+        console.log(err)
     });
 }
 
-client.once("ready", () => {
-    console.log("[IronBrew] Ready!")
+client.on("ready", () => {
+    console.log("Client Ready");
+
+    client.user.setPresence({ activities: [{ name: `over obfuscation`, type: ActivityType.Watching }] });
 });
 
-client.on("messageCreate", (message) => {
-    if (message.author.bot) return;
+client.on("interactionCreate", (interaction) => {
+    if (interaction.isCommand()) {
+        if (commandMap.has(interaction.commandName)) {
+            try {
+                const command = commandMap.get(interaction.commandName);
 
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift().toLowerCase();
-
-    if (command == "obfuscate") {
-        if (message.attachments && message.attachments.first()) {
-            let attachment = message.attachments.first();
-
-            if (attachment.size <= config.max_file_size) {
-                let embed = new discord.MessageEmbed()
-                    .setTitle("Processing")
-                    .setDescription("Obfuscating file, please wait")
-                    .setColor("ORANGE");
-                message.reply({ embeds: [embed] }).then((m) => {
-                    fetch(attachment.url).then((res) => {
-                        if (res.ok) {
-                            let id = makeid(config.id_length);
-                            let outStream = fs.createWriteStream(`temp/${id}_${attachment.name}`);
-
-                            streamPipeline(res.body, outStream).then(async () => {
-                                await obfuscate(fs.readFileSync(outStream.path), "utf-8");
-                                await fs.unlink(outStream.path, function(err){if(err) return console.log(err);});
-                                let embed = new discord.MessageEmbed()
-                                    .setTitle("Obfuscated")
-                                    .setDescription("Your attachment has been obfuscated successfully")
-                                    .setColor("GREEN");
-                                await m.edit({ embeds: [embed] });
-                                await wait(1000);
-                                await message.channel.send({ files: [new discord.MessageAttachment(path.join(__dirname, "/ironbrew/IronBrew2 CLI/bin/Debug/netcoreapp3.1/out.lua"))]})
-                                await fs.unlink(path.join(__dirname, "/ironbrew/IronBrew2 CLI/bin/Debug/netcoreapp3.1/out.lua"), function(err){if(err) return console.log(err);});
-                            }).catch((err) => {
-                                console.log(err)
-                                let embed = new discord.MessageEmbed()
-                                    .setTitle("Error")
-                                    .setDescription("Unable to write file to disk")
-                                    .setColor("RED");
-                                m.edit({ embeds: [embed] });
-                            });
-                        } else {
-                            let embed = new discord.MessageEmbed()
-                                .setTitle("Error")
-                                .setDescription("Unable to download file")
-                                .setColor("RED");
-                            m.edit({ embeds: [embed] });
-                        }
-                    }).catch((err) => {
-                        console.log(err)
-                        let embed = new discord.MessageEmbed()
+                // execute
+                command.execute(interaction, interaction.member, client);
+            } catch (e) {
+                console.log(`Error in command ${interaction.commandName} (or middleware): ${e}`);
+                interaction.reply({
+                    embeds: [
+                        new EmbedBuilder()
                             .setTitle("Error")
-                            .setDescription("Unable to download file")
-                            .setColor("RED");
-                        m.edit({ embeds: [embed] });
-                    });
+                            .setDescription(`An error occurred executing the \`${interaction.commandName}\` command Please try again later.`)
+                            .setColor("#2f3136")
+                    ], ephemeral: true
                 });
-            } else {
-                let embed = new discord.MessageEmbed()
-                    .setTitle("Error")
-                    .setDescription("Attachment is too large")
-                    .setColor("RED");
-                message.reply({ embeds: [embed] });
             }
         } else {
-            let embed = new discord.MessageEmbed()
-                .setTitle("Error")
-                .setDescription("No attachment provided")
-                .setColor("RED");
-            message.reply({ embeds: [embed] });
+            interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setTitle("Error")
+                        .setDescription(`Unknown Command - ID: \`${interaction.commandId}\``)
+                        .setColor("#2f3136")
+                ], ephemeral: true
+            });
         }
     }
-})
+});
 
-// login
-client.login(config.bot_token);
+
+client.login(process.env.TOKEN).then(() => {
+    console.log("Logged In");
+    deployCommands();
+    loadCommands();
+}).catch((err) => {
+    console.log(err)
+});
