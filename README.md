@@ -2,6 +2,7 @@
 <h1 align="center">IronBrew Bot</h1>
   <p align="center">
     This is just an IronBrew Obfuscator Discord Bot.
+    Invite: [Click Here](https://discord.com/api/oauth2/authorize?client_id=1031259683069100155&permissions=2147601408&scope=bot%20applications.commands)
     <br />
 </h1>
 
