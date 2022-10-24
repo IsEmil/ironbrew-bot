@@ -76,25 +76,24 @@ client.on("ready", () => {
 });
 
 client.on("interactionCreate", (interaction) => {
-    if (interaction.isCommand()) {
-        if (commandMap.has(interaction.commandName)) {
-            try {
-                const command = commandMap.get(interaction.commandName);
-
-                // execute
-                command.execute(interaction, interaction.member, client);
-            } catch (e) {
-                console.log(`Error in command ${interaction.commandName} (or middleware): ${e}`);
-                interaction.reply({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setTitle("Error")
-                            .setDescription(`An error occurred executing the \`${interaction.commandName}\` command Please try again later.`)
-                            .setColor("#2f3136")
-                    ], ephemeral: true
-                });
-            }
-        } else {
+    if (interaction.isCommand() && commandMap.has(interaction.commandName)) { // If it is a command
+        try {
+            const command = commandMap.get(interaction.commandName);
+            
+            // execute
+            command.execute(interaction, interaction.member, client);
+        } catch (e) {
+            console.log(`Error when executing Command: ${interaction.commandName} (or middleware): ${e}`);
+            interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setTitle("Error")
+                        .setDescription(`An error occurred executing Command: \`${interaction.commandName}\`. Please try again later.`)
+                        .setColor("#2f3136")
+                ], ephemeral: true
+            });
+        }
+     } else {
             interaction.reply({
                 embeds: [
                     new EmbedBuilder()
@@ -104,7 +103,6 @@ client.on("interactionCreate", (interaction) => {
                 ], ephemeral: true
             });
         }
-    }
 });
 
 
