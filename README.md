@@ -32,15 +32,11 @@ npm install
 
 ### Configurations
 
-Edit the config.js file and insert your credentials
+Edit the .env file and insert your credentials
 
-```js
-module.exports = exports = {
-    "bot_token": "", // bot token
-    "prefix": "!", // bot prefix
-    "id_length": 10, // length of file ids
-    "max_file_size": 1e+7, // max file size in bytes
-}
+```env
+TOKEN = ""
+GuildID = ""
 ```
 
 <br/>
