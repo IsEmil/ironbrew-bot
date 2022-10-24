@@ -62,7 +62,7 @@ function deployCommands() {
 
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
-    rest.put(Routes.applicationGuildCommands(client.user.id, "827916807574257704"), { body: commands }).then(() => {
+    rest.put(Routes.applicationGuildCommands(client.user.id, proccess.env.GuildID), { body: commands }).then(() => {
         console.log('Successfully registered application commands.')
     }).catch((err) => {
         console.log(err)
