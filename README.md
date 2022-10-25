@@ -12,6 +12,8 @@ Invite: [Click Here](https://discord.com/api/oauth2/authorize?client_id=10312596
 
 ## 🛠 Getting Started
 
+### This only works for roblox and not base lua.
+
 Please install the following before you do anything else!
 <br>[.NET 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 <br>[.NET Core 3.1](https://dotnet.microsoft.com/en-us/download/dotnet/3.1)
