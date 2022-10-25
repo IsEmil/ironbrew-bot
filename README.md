@@ -13,7 +13,7 @@ Please install the following before you do anything else!
 <br>[.NET 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 <br>[.NET Core 3.1](https://dotnet.microsoft.com/en-us/download/dotnet/3.1)
 <br>[.NET Core 2.0](https://dotnet.microsoft.com/en-us/download/dotnet/2.0)
-To get a local copy up and running follow these simple steps.
+<br><br>To get a local copy up and running follow these simple steps.
 <br/>
 
 <!-- Installation -->
