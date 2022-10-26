@@ -1,11 +1,9 @@
 <!-- Title -->
 <h1 align="center">IronBrew Bot</h1>
   <p align="center">
-    This is just an IronBrew Obfuscator Discord Bot.
+    A discord bot coded in discord.js that utilizes IronBrew2
     <br />
 </h1>
-
-## Invite
 
 Invite: [Click Here](https://discord.com/api/oauth2/authorize?client_id=1031259683069100155&permissions=2147601408&scope=bot%20applications.commands)
 <br/>
@@ -14,7 +12,13 @@ Invite: [Click Here](https://discord.com/api/oauth2/authorize?client_id=10312596
 
 ## 🛠 Getting Started
 
-To get a local copy up and running follow these simple steps.
+### This only works for roblox and not base lua.
+
+Please install the following before you do anything else!
+<br>[.NET 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+<br>[.NET Core 3.1](https://dotnet.microsoft.com/en-us/download/dotnet/3.1)
+<br>[.NET Core 2.0](https://dotnet.microsoft.com/en-us/download/dotnet/2.0)
+<br><br>To get a local copy up and running follow these simple steps.
 <br/>
 
 <!-- Installation -->
