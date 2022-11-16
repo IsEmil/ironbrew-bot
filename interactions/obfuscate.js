@@ -13,11 +13,10 @@ const IB2 = require("../ib2.js");
 /**
  * @description The function executed when a command is invoked
  * @param {Interaction} interaction
- * @param {GuildMember} member 
  */
-async function run(interaction, member) {
-    const response = await fetch(interaction.options.getAttachment("code").url);
-    const text = await response.text();
+async function run(interaction) {
+    const response = await fetch(interaction.options.getAttachment("code").url); // gets the file from returned url 
+    const text = await response.text(); // file code
 
     IB2(text).then(async (src) => {
         const input = tmp.fileSync();

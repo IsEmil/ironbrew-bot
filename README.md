@@ -15,12 +15,17 @@ Invite: [Click Here](https://discord.com/api/oauth2/authorize?client_id=10312596
 ### This only works for roblox and not base lua.
 
 > *Please do `npm install` before running the code. If it asks you to do `npm audit fix --force` or `npm fund` please do those before starting the bot!*
+<details>
+<summary>Please install the following before you do anything else! (Click me)</summary>
+<br>
 
-Please install the following before you do anything else!
 <br>[.NET 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 <br>[.NET Core 3.1](https://dotnet.microsoft.com/en-us/download/dotnet/3.1)
 <br>[.NET Core 2.0](https://dotnet.microsoft.com/en-us/download/dotnet/2.0)
 <br><br>To get a local copy up and running follow these simple steps.
+</details>
+
+
 <br/>
 
 <!-- Installation -->
