@@ -83,7 +83,7 @@ function deployCommands() {
 
 client.on("ready", () => {
     console.log("Client Ready");
-    client.user.setPresence({ activities: [{ name: process.env.PRE_TITLE, type: ActivityType[process.env.PRE_TYPE.toString()] }] })
+    client.user.setPresence({ activities: [{ name: `over obfuscation`, type: ActivityType.Watching }] });
 });
 
 /*
